@@ -1,0 +1,4 @@
+([('app',
+   '/Users/user/Documents/python '
+   'vscode/KURS_ALGORYTMY/PythonApplication1/BlackjackGame/dist/app',
+   'EXECUTABLE')],)
