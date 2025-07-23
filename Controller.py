@@ -14,8 +14,9 @@ class BlackjackController:
         self.view = view
         # show dealer's cards drawn one by one with 0,5s break
         self.timer = QTimer()
-        self.timer.setInterval(500) # ms
-        self.timer.timeout.connect(self.dealer_hit_step) # this is called every 500 ms
+        self.timer.setInterval(500) # [ms]
+        # this is called every 500 ms
+        self.timer.timeout.connect(self.dealer_hit_step) 
         # 'connect' buttons signals with particular functions
         self.view.hit_signal.connect(self.hit)
         self.view.stand_signal.connect(self.stand)
@@ -30,13 +31,14 @@ class BlackjackController:
         player = self.table.get_curr_player()
         try:
             player.hit()
-        
-        except IndexError: # if no more cards in the deck
+        # if no more cards in the deck
+        except IndexError: 
             self.view.no_cards_warn()
             return
     
         if player.get_hand_score() > 21:
-            self.table.next_player() # if no more players -> it sets is_game_over=True
+            # if no more players -> sets is_game_over=True
+            self.table.next_player() 
             self.update_view('busted')
             if self.table.is_game_over:
                 self.view.disable_game_buttons()
@@ -47,7 +49,8 @@ class BlackjackController:
     def stand(self):
         if self.table.is_game_over:
             return
-        self.table.next_player() # if no more players -> it sets is_game_over=True
+        # if no more players -> sets is_game_over=True
+        self.table.next_player() 
         self.update_view('stand')
         if self.table.is_game_over:
             self.view.disable_game_buttons()
@@ -87,7 +90,8 @@ class BlackjackController:
         # for eventual counting how many cards are taken or to implement custom logic or animating each card with counting
         self.dealer_hit_index = 0   
         self.dealer = self.table.croupier
-        self.timer.start() # trigger to start executing dealer_hit_step
+        # trigger to start executing dealer_hit_step
+        self.timer.start() 
     
     def dealer_hit_step(self):
         try:

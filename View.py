@@ -28,7 +28,8 @@ class GameWindow(QWidget):
 
         self.dealer_and_scores_layout = QHBoxLayout()
         self.players_container = QVBoxLayout()
-        self.activity_layout = QHBoxLayout() # displays players moves (hit/stand) and round results (win/busted) vs dealer
+        # displays players moves (hit/stand) and round results (win/busted) vs dealer
+        self.activity_layout = QHBoxLayout() 
         self.buttons_layout = QHBoxLayout()
 
         self.main_layout.addLayout(self.dealer_and_scores_layout)
@@ -72,7 +73,7 @@ class GameWindow(QWidget):
         self.stand_button.clicked.connect(self.stand_signal.emit)
         self.restart_button.clicked.connect(self.restart_signal.emit)
         
-        # for fast and easy getting each player scores (not usefull here)
+        # for fast and easy getting each player scores -> {player_name : score}
         self.players_scores = {}
 
     def init_setup(self, table: Table) -> None:
@@ -116,8 +117,6 @@ class GameWindow(QWidget):
                 label.setFont(font)
             else:
                 label = CardWidget(card.rank[0], card.suit)
-                #label = QLabel(f"{card.rank[0]}{card.suit}")
-            #label.setStyleSheet(f"border: 2px solid black; padding: 10px; background: white; color: {color}; min-width: 60px; min-height: 100px;")
             dealer_cards.addWidget(label)
 
         self.dealer_cards_layout.addWidget(d_box)
@@ -164,9 +163,6 @@ class GameWindow(QWidget):
             cards_layout = QGridLayout()
             max_cards_horizontally = 3
             for j, card in enumerate(player.hand):
-                #color = "red" if card.suit in ['♦', '♥'] else "black"
-                #label = QLabel(f"{card.rank[0]}{card.suit}")
-                #label.setStyleSheet(f"border: 2px solid black; padding: 10px; background: white; color: {color}; min-width: 60px; min-height: 100px;")
                 label = CardWidget(card.rank[0], card.suit)
                 cards_layout.addWidget(label, 
                                         j // max_cards_horizontally,
@@ -213,8 +209,8 @@ class GameWindow(QWidget):
             self.player_move.setText(f"{action.upper()}!")
 
     def show_results(self, dealer_score: int, res_table: list): 
-        # note: res_table = [(player_name, hand_score, action)]
         ''' Show results of each player at the end of the round '''
+        # note: res_table = [(player_name, hand_score, action)]
         self.clear_layout(self.activity_layout)
 
         res_box = QVBoxLayout()
@@ -288,9 +284,10 @@ class SetupDialog(QWidget):
         # action to change the number in the bar
         self.spin_box.valueChanged.connect(self.update_players_input)
         self.start_button.clicked.connect(self.save_player_names)
-        
-        self.players_input = [] # to store names from the input      
-        self.update_players_input() # init window for the first time
+        # to store names from the input      
+        self.players_input = [] 
+        # init window for the first time
+        self.update_players_input() 
 
     def update_players_input(self):
         ''' Update view as player count changes '''
@@ -316,17 +313,20 @@ class CardWidget(QWidget):
         super().__init__()
         self.rank = rank
         self.suit = suit
-        self.cards_dir = cards_dir
+        # the absolute path of the directory containing this script (__file__ is the name of the file: 'View.py' here)
+        # this avoids issues with relative paths when the script is run from a different location;
+        # it ensures that app will find /cards_png dir, no matter how its launched (from IDE, terminal)
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        self.cards_dir = os.path.join(base_dir, cards_dir) 
         self.init_card()
 
     def generate_card_endpoint(self):
         mapper = {'♣': 'C', '♦': 'D', '♥': 'H', '♠': 'S'}
-        return f"{self.rank}{mapper[self.suit]}.png" 
+        return f"{self.rank}{mapper[self.suit]}.png"  
     
     def init_card(self):
-        # /cards_png/rank+suit.png 
+        # path = 'absolute_path_of_the_module'/cards_png/{rank}{suit}.png;
         path = os.path.join(self.cards_dir, self.generate_card_endpoint())
-        print("path", path)
         self.card_layout = QVBoxLayout()
         self.setLayout(self.card_layout)
         self.label = QLabel()
@@ -335,7 +335,7 @@ class CardWidget(QWidget):
         if os.path.exists(path):
             pixmap = QPixmap(path).scaled(100, 145, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
             self.label.setPixmap(pixmap)
-        else: # if there is no such file
+        else: # if there is no such file use default
             color = "red" if self.suit in ['♦', '♥'] else "black"
             self.label.setText(f"{self.rank}{self.suit}")
             self.label.setStyleSheet(f"border: 2px solid black; padding: 10px; background: white; color: {color}; min-width: 60px; min-height: 100px;")
