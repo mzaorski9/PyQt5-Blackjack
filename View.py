@@ -1,13 +1,15 @@
 from PyQt5.QtWidgets import (
     QApplication, QPushButton, QMainWindow, QCheckBox, QWidget, QVBoxLayout, 
     QHBoxLayout, QGridLayout, QMenuBar, QGroupBox, QLabel, QSizePolicy, QLayout, QMessageBox,
-    QSpinBox, QStackedWidget, QLineEdit
+    QSpinBox, QStackedWidget, QLineEdit, QScrollArea
     )
 from PyQt5.QtGui import QFont, QPixmap
 from PyQt5.QtCore import Qt, pyqtSignal 
 from Model import Table, BlackjackTable, IPlayable
 import time
 import os
+
+
 
 
 class GameWindow(QWidget):
@@ -20,11 +22,34 @@ class GameWindow(QWidget):
         self.initUI()
 
     def initUI(self) -> None:
+        ''' Game UI structure:
+        GameWindow (self)
+            └── outer_layout
+                └── QScrollArea
+                    └── scroll_container (QWidget)
+                        └── main_layout (QVBoxLayout)
+                            ├── dealer_and_scores_layout
+                            ├── players_container
+                            ├── activity_layout
+                            └── buttons_layout
+        '''
         self.setWindowTitle("Blackjack")
         self.setGeometry(100, 100, 1000, 1000)
 
         self.main_layout = QVBoxLayout()
-        self.setLayout(self.main_layout)
+        self.scroll_container = QWidget()
+        self.scroll_container.setLayout(self.main_layout)
+        # QScrollArea is a specialized widget that contains exactly one widget; it 
+        # displays scrollable child widget which should contain the layout
+        scroll_area = QScrollArea()
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setWidget(self.scroll_container)
+        # outer_layout needed because our GameWindow(Widget).setLayout() expects QLayout, not QWidget,
+        # + it places scroll_area widget correctly within it
+        outer_layout = QVBoxLayout()
+        outer_layout.addWidget(scroll_area)
+        # setting the main window's layout
+        self.setLayout(outer_layout)
 
         self.dealer_and_scores_layout = QHBoxLayout()
         self.players_container = QVBoxLayout()
