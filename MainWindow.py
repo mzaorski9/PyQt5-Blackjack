@@ -12,7 +12,7 @@ import time
 
 
 class MainWindow(QMainWindow):
-    ''' This is the main window for all views - it remains the same, but the views in it change '''
+    ''' This is the main window for all views - it remains the same, but the views displayed in it change '''
     def __init__(self):
         super().__init__()
 
@@ -35,6 +35,7 @@ class MainWindow(QMainWindow):
         self.stack.setCurrentWidget(self.start_window)
 
     def show_setup_dial(self):
+        ''' Show players setup window '''
         self.stack.setCurrentWidget(self.setup_window)
 
     def start_game(self, players_list: list):
